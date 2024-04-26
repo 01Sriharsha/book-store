@@ -31,6 +31,8 @@ public class Token {
 
     private String token;
 
+    private LocalDateTime expiresAt;
+
     @ManyToOne
     private User user;
 

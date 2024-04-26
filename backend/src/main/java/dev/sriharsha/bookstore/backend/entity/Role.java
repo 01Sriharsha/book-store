@@ -34,7 +34,7 @@ public class Role {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany
     List<User> users;
 
     @CreatedDate
