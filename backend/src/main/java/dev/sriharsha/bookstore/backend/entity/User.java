@@ -54,8 +54,15 @@ public class User implements UserDetails, Principal {
     private Set<Role> roles;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Token> tokens;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Book> myBooks;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<TransactionHistory> histories;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
