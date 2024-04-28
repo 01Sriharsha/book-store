@@ -13,21 +13,21 @@ import dev.sriharsha.bookstore.backend.entity.Role;
 import dev.sriharsha.bookstore.backend.repository.RoleRepository;
 
 @SpringBootApplication
-@EnableJpaAuditing
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
 @EnableAsync
 public class BackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BackendApplication.class, args);
+    }
 
-	@Bean
-	public CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
-		return args -> {
-			var admin = Role.builder().id(600).name("ADMIN").build();
-			var user = Role.builder().id(601).name("USER").build();
-			roleRepository.saveAll(List.of(admin, user));
-		};
-	}
+    @Bean
+    public CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
+        return args -> {
+            var admin = Role.builder().id(600).name("ADMIN").build();
+            var user = Role.builder().id(601).name("USER").build();
+            roleRepository.saveAll(List.of(admin, user));
+        };
+    }
 
 }
