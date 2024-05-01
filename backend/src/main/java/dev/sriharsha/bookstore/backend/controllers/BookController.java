@@ -6,6 +6,7 @@ import dev.sriharsha.bookstore.backend.dto.BookResponse;
 import dev.sriharsha.bookstore.backend.dto.BorrowedBookResponse;
 import dev.sriharsha.bookstore.backend.dto.Response;
 import dev.sriharsha.bookstore.backend.service.BookService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/books")
@@ -93,7 +95,88 @@ public class BookController {
                 .message("Returned Book fetched Successfully")
                 .data(allReturnedBooks)
                 .build();
-        return new ResponseEntity<>(response, HttpStatus.OK); 
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/update/shareable/{bookId}")
+    public ResponseEntity<?> updateShareableStatus(
+            @PathVariable Integer bookId,
+            Authentication authenticatedUser
+    ) {
+        Integer id = bookService.updateShareableStatus(authenticatedUser, bookId);
+        Response response = Response.builder()
+                .message("Shareable status updated successfully")
+                .data(id)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update/archive/{bookId}")
+    public ResponseEntity<?> updateArchiveStatus(
+            @PathVariable Integer bookId,
+            Authentication authenticatedUser
+    ) {
+        Integer id = bookService.updateArchiveStatus(authenticatedUser, bookId);
+        Response response = Response.builder()
+                .message("Archive status updated successfully")
+                .data(id)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/borrow/{bookId}")
+    public ResponseEntity<?> borrowBook(
+            @PathVariable Integer bookId,
+            Authentication authenticatedUser
+    ) {
+        Integer id = bookService.borrowBook(authenticatedUser, bookId);
+        Response response = Response.builder()
+                .message("Book borrowed successfully")
+                .data(id)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/borrow/return/{bookId}")
+    public ResponseEntity<?> returnBorrowedBook(
+            @PathVariable Integer bookId,
+            Authentication authenticatedUser
+    ) {
+        Integer id = bookService.returnBorrowedBook(authenticatedUser, bookId);
+        Response response = Response.builder()
+                .message("Book returned successfully")
+                .data(id)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/borrow/approve/{bookId}/{borrowedUserId}")
+    public ResponseEntity<?> approveReturnedBook(
+            @PathVariable Integer bookId,
+            @PathVariable Integer borrowedUserId,
+            Authentication authenticatedUser
+    ) {
+        Integer id = bookService.approveReturnedBook(authenticatedUser, bookId, borrowedUserId);
+        Response response = Response.builder()
+                .message("Book return approved successfully")
+                .data(id)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping(name = "/cover/{bookId}", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadBookCoverImage(
+            @PathVariable Integer bookId,
+            @Parameter()
+            @RequestPart("file") MultipartFile file,
+            Authentication authenticatedUser
+    ) {
+        Integer id = bookService.uploadBookCoverImage(authenticatedUser, bookId , file);
+        Response response = Response.builder()
+                .message("Book cover image uploaded successfully")
+                .data(id)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 }
