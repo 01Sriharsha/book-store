@@ -60,4 +60,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundException(
+            ResourceNotFoundException exception) {
+        Response errorResponse = Response.builder().message(exception.getMessage()).build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(OperationNotPermittedException.class)
+    public ResponseEntity<?> handleOperationNotPermittedException(
+            OperationNotPermittedException exception) {
+        Response errorResponse = Response.builder().message(exception.getMessage()).build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_MODIFIED);
+    }
 }
