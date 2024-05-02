@@ -63,6 +63,9 @@ public class User implements UserDetails, Principal {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TransactionHistory> histories;
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Feedback> feedbacks;
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

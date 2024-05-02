@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SuperBuilder
 public class Feedback extends BaseEntity {
 
     @Id
@@ -23,4 +25,7 @@ public class Feedback extends BaseEntity {
 
     @ManyToOne
     private Book book;
+
+    @ManyToOne
+    private User user;
 }
