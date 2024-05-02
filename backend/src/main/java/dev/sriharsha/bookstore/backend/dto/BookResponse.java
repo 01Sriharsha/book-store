@@ -7,7 +7,7 @@ public record BookResponse(
         String title,
         String author,
         String synopsis,
-        String bookCover,
+        byte[] bookCover,
         boolean shareable,
         boolean archived,
         Integer userId,

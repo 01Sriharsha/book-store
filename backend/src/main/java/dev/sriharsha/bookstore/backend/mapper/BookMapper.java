@@ -5,10 +5,15 @@ import dev.sriharsha.bookstore.backend.dto.BookResponse;
 import dev.sriharsha.bookstore.backend.dto.BorrowedBookResponse;
 import dev.sriharsha.bookstore.backend.entity.Book;
 import dev.sriharsha.bookstore.backend.entity.TransactionHistory;
+import dev.sriharsha.bookstore.backend.service.FileService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BookMapper {
+
+    private final FileService fileService;
 
     public Book mapToBook(BookRequest request) {
         return Book.builder()
@@ -26,12 +31,12 @@ public class BookMapper {
         return BookResponse.builder()
                 .id(book.getId())
                 .title(book.getTitle())
-                .bookCover(book.getBookCover())
                 .shareable(book.isShareable())
                 .author(book.getAuthor())
                 .archived(book.isArchived())
                 .synopsis(book.getSynopsis())
                 .rating(book.getRating())
+                .bookCover(fileService.readFileFromPath(book.getBookCover()))
                 .userId(book.getOwner().getId())
                 .username(book.getOwner().getFullname())
                 .build();

@@ -211,7 +211,7 @@ public class BookService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID::" + bookId));
         User user = (User) authenticatedUser.getPrincipal();
-        String bookCoverImage = fileService.save(book.getId(), user.getId(), file);
+        String bookCoverImage = fileService.save(user.getId(), file);
         book.setBookCover(bookCoverImage);
         return bookRepository.save(book).getId();
     }
