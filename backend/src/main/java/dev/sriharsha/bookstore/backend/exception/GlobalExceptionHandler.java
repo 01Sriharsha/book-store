@@ -71,6 +71,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleOperationNotPermittedException(
             OperationNotPermittedException exception) {
         Response errorResponse = Response.builder().message(exception.getMessage()).build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_MODIFIED);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileHandleException.class)
+    public ResponseEntity<?> handleFileHandleException(
+            FileHandleException exception) {
+        Response errorResponse = Response.builder().message(exception.getMessage()).build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
