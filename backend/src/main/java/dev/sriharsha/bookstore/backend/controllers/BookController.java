@@ -25,7 +25,10 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping
-    public ResponseEntity<?> saveBook(@RequestBody @Valid BookRequest bookRequest, Authentication authenticatedUser) {
+    public ResponseEntity<?> saveBook(
+            Authentication authenticatedUser,
+            @RequestBody @Valid BookRequest bookRequest
+    ) {
         BookResponse bookResponse = bookService.save(authenticatedUser, bookRequest);
         Response response = Response.builder()
                 .message("Book Saved Successfully")
@@ -51,7 +54,21 @@ public class BookController {
     ) {
         PageResponse<BookResponse> books = bookService.getAllBooks(pageNumber, size);
         Response response = Response.builder()
-                .message("Book fetched Successfully")
+                .message("Books fetched Successfully")
+                .data(books)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/display")
+    public ResponseEntity<?> getDisplayBooksOfOwner(
+            Authentication authenticatedUser,
+            @RequestParam(name = "page", defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size
+    ) {
+        PageResponse<BookResponse> books = bookService.getAllDisplayBooks(authenticatedUser, pageNumber, size);
+        Response response = Response.builder()
+                .message("Books fetched Successfully")
                 .data(books)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -59,24 +76,26 @@ public class BookController {
 
     @GetMapping("/owner")
     public ResponseEntity<?> getAllBooksOfOwner(
+            Authentication authenticatedUser,
             @RequestParam(name = "page", defaultValue = "0", required = false) int pageNumber,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size
     ) {
-        PageResponse<BookResponse> books = bookService.getAllBooks(pageNumber, size);
+        PageResponse<BookResponse> books = bookService.getAllBooksOfOwner(authenticatedUser, pageNumber, size);
         Response response = Response.builder()
-                .message("Book fetched Successfully")
+                .message("Books fetched Successfully")
                 .data(books)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/borrowed")
-    public ResponseEntity<?> getAllBorrowedBooksOfUser(
+    public ResponseEntity<?> getAllBorrowedBooksOfOwner(
+            Authentication authenticatedUser,
             @RequestParam(name = "page", defaultValue = "0", required = false) int pageNumber,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size
     ) {
         PageResponse<BorrowedBookResponse> allBorrowedBooksOfUser = bookService
-                .getAllBorrowedBooksOfUser(pageNumber, size);
+                .getAllBorrowedBooksOfOwner(authenticatedUser, pageNumber, size);
         Response response = Response.builder()
                 .message("Borrowed Book fetched Successfully")
                 .data(allBorrowedBooksOfUser)
@@ -86,13 +105,14 @@ public class BookController {
 
     @GetMapping("/returned")
     public ResponseEntity<?> getAllReturnedBooks(
+            Authentication authenticatedUser,
             @RequestParam(name = "page", defaultValue = "0", required = false) int pageNumber,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size
     ) {
         PageResponse<BorrowedBookResponse> allReturnedBooks = bookService
-                .getAllReturnedBooks(pageNumber, size);
+                .getAllReturnedBooksOfOwner(authenticatedUser, pageNumber, size);
         Response response = Response.builder()
-                .message("Returned Book fetched Successfully")
+                .message("Returned Books fetched Successfully")
                 .data(allReturnedBooks)
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -171,7 +191,7 @@ public class BookController {
             @RequestPart("file") MultipartFile file,
             Authentication authenticatedUser
     ) {
-        Integer id = bookService.uploadBookCoverImage(authenticatedUser, bookId , file);
+        Integer id = bookService.uploadBookCoverImage(authenticatedUser, bookId, file);
         Response response = Response.builder()
                 .message("Book cover image uploaded successfully")
                 .data(id)

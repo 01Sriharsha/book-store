@@ -14,6 +14,7 @@ import dev.sriharsha.bookstore.backend.repository.BookRepository;
 import dev.sriharsha.bookstore.backend.repository.TransactionHistoryRepository;
 import dev.sriharsha.bookstore.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookService {
 
     private final BookMapper bookMapper;
@@ -39,6 +41,11 @@ public class BookService {
 
     public BookResponse save(Authentication authenticatedUser, BookRequest bookRequest) {
         User user = (User) authenticatedUser.getPrincipal();
+        log.info("Current logged-in User:- {}, {} , {}", user.getId(),
+                user.getFullname(), user.getEmail());
+        if (bookRepository.existsByTitle(bookRequest.title())) {
+            throw new OperationNotPermittedException("A book with same title already exists");
+        }
         Book book = bookMapper.mapToBook(bookRequest);
         book.setOwner(user);
         Book savedBook = bookRepository.save(book);
@@ -48,12 +55,12 @@ public class BookService {
     public BookResponse getBookById(Integer bookId) {
         return bookRepository.findById(bookId)
                 .map(bookMapper::mapToBookResponse)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID::" + bookId));
     }
 
     public PageResponse<BookResponse> getAllBooks(int pageNumber, int size) {
-//        User user = (User) authenticatedUser.getPrincipal();
-        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt")
+                .descending());
         Page<Book> books = bookRepository.findAll(pageable);
         List<BookResponse> bookResponse = books.stream()
                 .map(bookMapper::mapToBookResponse)
@@ -69,9 +76,17 @@ public class BookService {
         );
     }
 
-    public PageResponse<BookResponse> getAllBooksOfOwner(int pageNumber, int size) {
-        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt").descending());
-        Page<Book> books = bookRepository.findByOwnerId(0, pageable);
+    //Get all books that can be displayed and exclude the current logged-in user books
+    public PageResponse<BookResponse> getAllDisplayBooks(
+            Authentication authenticatedUser, int pageNumber, int size
+    ) {
+        User currentUser = (User) authenticatedUser.getPrincipal();
+        log.info("Current logged-in User:-{}, {} , {}", currentUser.getId(),
+                currentUser.getFullname(), currentUser.getEmail());
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt")
+                .descending());
+        Page<Book> books = bookRepository
+                .findByOwnerIdNotAndShareableIsTrue(currentUser.getId(), pageable);
         List<BookResponse> bookResponse = books.stream()
                 .map(bookMapper::mapToBookResponse)
                 .toList();
@@ -86,9 +101,37 @@ public class BookService {
         );
     }
 
-    public PageResponse<BorrowedBookResponse> getAllBorrowedBooksOfUser(int pageNumber, int size) {
+    //Get all books of current logged-in user
+    public PageResponse<BookResponse> getAllBooksOfOwner(
+            Authentication authenticatedUser, int pageNumber, int size
+    ) {
+        User currentUser = (User) authenticatedUser.getPrincipal();
+        log.info("Current logged-in User:- {} , {}", currentUser.getFullname(), currentUser.getEmail());
         Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt").descending());
-        Page<TransactionHistory> borrowedBooks = transactionHistoryRepository.findByUserId(pageable, 0);
+        Page<Book> books = bookRepository.findByOwnerId(currentUser.getId(), pageable);
+        List<BookResponse> bookResponse = books.stream()
+                .map(bookMapper::mapToBookResponse)
+                .toList();
+        return new PageResponse<>(
+                bookResponse,
+                books.getNumber(),
+                books.getSize(),
+                books.getNumberOfElements(),
+                books.getTotalPages(),
+                books.isFirst(),
+                books.isLast()
+        );
+    }
+
+    //Get all borrowed books of current logged-in user
+    public PageResponse<BorrowedBookResponse> getAllBorrowedBooksOfOwner(
+            Authentication authenticatedUser, int pageNumber, int size
+    ) {
+        User currentUser = (User) authenticatedUser.getPrincipal();
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt")
+                .descending());
+        Page<TransactionHistory> borrowedBooks = transactionHistoryRepository
+                .findByUserId(pageable, currentUser.getId());
         List<BorrowedBookResponse> borrowedBookResponse = borrowedBooks.stream()
                 .map(bookMapper::mapToBorrowedBookResponse)
                 .toList();
@@ -103,9 +146,14 @@ public class BookService {
         );
     }
 
-    public PageResponse<BorrowedBookResponse> getAllReturnedBooks(int pageNumber, int size) {
+    //Get all returned books of current logged-in user
+    public PageResponse<BorrowedBookResponse> getAllReturnedBooksOfOwner(
+            Authentication authenticatedUser, int pageNumber, int size
+    ) {
+        User currentUser = (User) authenticatedUser.getPrincipal();
         Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("createdAt").descending());
-        Page<TransactionHistory> borrowedBooks = transactionHistoryRepository.findByBookOwnerId(pageable, 0);
+        Page<TransactionHistory> borrowedBooks = transactionHistoryRepository
+                .findByBookOwnerId(pageable, currentUser.getId());
         List<BorrowedBookResponse> borrowedBookResponse = borrowedBooks.stream()
                 .map(bookMapper::mapToBorrowedBookResponse)
                 .toList();
