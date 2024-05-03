@@ -51,7 +51,7 @@ public class FileService {
     }
 
     public byte[] readFileFromPath(String filePath) {
-        if (filePath.isEmpty() || filePath.isBlank()) {
+        if (filePath == null || filePath.isEmpty() || filePath.isBlank()) {
             return null;
         }
         try {

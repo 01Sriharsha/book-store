@@ -22,6 +22,7 @@ public class Book extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(unique = true, nullable = false)
     private String title;
 
     private String author;
@@ -31,7 +32,7 @@ public class Book extends BaseEntity {
     private String bookCover;
 
     private boolean archived;
-
+    
     private boolean shareable;
 
     @ManyToOne
@@ -46,7 +47,7 @@ public class Book extends BaseEntity {
 
     @Transient
     public double getRating() {
-        if (feedbacks.size() == 0) {
+        if (feedbacks == null || feedbacks.size() == 0) {
             return 0.0;
         } else {
             double rate = this.feedbacks.stream()

@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Integer> {
+
+    boolean existsByTitle(String title);
+
     //Fetch all books except the books of current authenticated user
     Page<Book> findByOwnerIdNotAndShareableIsTrue(Integer ownerId, Pageable pageable);
 
