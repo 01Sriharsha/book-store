@@ -45,7 +45,32 @@ public class FeedbackController {
                 .message("Feedback saved successfully")
                 .data(allFeedbacksOfBook)
                 .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/{feedbackId}")
+    public ResponseEntity<?> updateFeedback(
+            Authentication authenticatedUser,
+            @PathVariable Integer feedbackId,
+            @RequestBody FeedbackRequest feedbackRequest
+    ) {
+        Integer id = feedbackService.updateFeedback(authenticatedUser, feedbackId, feedbackRequest);
+        Response response = Response.builder()
+                .message("Feedback updated successfully")
+                .data(id)
+                .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{feedbackId}")
+    public ResponseEntity<?> deleteFeedback(
+            Authentication authenticatedUser,
+            @PathVariable Integer feedbackId
+    ) {
+        feedbackService.deleteFeedback(authenticatedUser, feedbackId);
+        Response response = Response.builder()
+                .message("Feedback deleted successfully")
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
