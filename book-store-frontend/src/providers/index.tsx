@@ -1,9 +1,12 @@
 "use client";
 
 import { Fragment, ReactNode } from "react";
-import { ThemeProvider } from "@/providers/theme-provider";
 import { Provider as ReduxProvider } from "react-redux";
+import { Toaster } from "sonner";
+
 import store from "@/store";
+import ThemeProvider from "@/providers/theme-provider";
+import AuthProvider from "@/providers/auth-provider";
 
 export default function AppProvider({ children }: { children: ReactNode }) {
   return (
@@ -15,8 +18,11 @@ export default function AppProvider({ children }: { children: ReactNode }) {
         enableSystem
         disableTransitionOnChange
       >
-        <ReduxProvider store={store}>{children}</ReduxProvider>
+        <ReduxProvider store={store}>
+          <AuthProvider>{children}</AuthProvider>
+        </ReduxProvider>
       </ThemeProvider>
+      <Toaster closeButton richColors position="bottom-right" />
     </Fragment>
   );
 }
