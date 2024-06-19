@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import AppProvider from "@/providers";
 
-const poppins = Poppins({ subsets: ["latin"], weight: "400" });
+const roboto = Roboto({ subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
   title: "Book Store",
@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode; 
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.className}>
+      <body className={roboto.className}>
         <AppProvider>{children}</AppProvider>
       </body>
     </html>
