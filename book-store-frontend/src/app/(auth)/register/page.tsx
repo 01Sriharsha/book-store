@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterSchema } from "@/lib/zod";
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function RegisterForm() {
   const form = useForm<RegisterSchema>({
@@ -137,8 +137,8 @@ export default function RegisterForm() {
           </div>
           <div className="text-center mb-2 text-sm">
             Already have an account?&nbsp;
-            <Link href="/?login=true" className="underline text-primary">
-              Register Now!
+            <Link href="/login" className="underline text-primary">
+              Login
             </Link>
           </div>
         </form>
