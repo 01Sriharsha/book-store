@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -59,9 +60,9 @@ export default function LoginPage() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-[400px] p-4 rounded-xl border border-gray-700 shadow-sm"
+          className="w-[400px] p-4 rounded-xl border border-primary/30 shadow-sm bg-background"
         >
-          <h1 className="text-2xl text-center font-semibold my-3">Login</h1>
+          <h1 className="text-2xl text-center text-primary font-semibold my-3">Login</h1>
           <div className="space-y-4">
             <FormField
               name="email"
@@ -95,6 +96,12 @@ export default function LoginPage() {
           <Button disabled={loading} type="submit" className="w-full my-4">
             {loading ? <Loader className="animate-spin" /> : "Submit"}
           </Button>
+          <div className="text-center mb-2 text-sm">
+            Doesn&apos;t have an account?&nbsp;
+            <Link href="/register" className="underline text-primary">
+              Register
+            </Link>
+          </div>
         </form>
       </Form>
     </div>
