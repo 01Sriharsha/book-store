@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import NavItem from "@/components/global/nav-item";
+import Search from "./search";
 
 export default function Navbar() {
   return (
@@ -14,6 +15,7 @@ export default function Navbar() {
         </ul>
       </div>
       <div className="flex items-center gap-3">
+        <Search />
         <Link href="/login">
           <Button>Login</Button>
         </Link>
