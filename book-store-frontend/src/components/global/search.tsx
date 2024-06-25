@@ -1,27 +1,46 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "../ui/input";
-import { SearchIcon } from "lucide-react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { updateSearchTerm } from "@/store/features/search-slice";
+import { Input } from "@/components/ui/input";
 
 export default function Search() {
+  const searchRef = useRef<HTMLInputElement>(null);
+  const dispatch = useAppDispatch();
+
+  const { open, searchTerm } = useAppSelector((state) => state.search);
   const [keyword, setKeyword] = useState("");
-  const [show, setShow] = useState(false);
-  const toggleIcon = () => setShow(!show);
+
+  useEffect(() => {
+    if (open && searchRef.current) {
+      searchRef.current.focus();
+    }
+  }, [open]);
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dispatch(updateSearchTerm(keyword));
+  };
+
   return (
-    <div className="relative">
-      <SearchIcon role="button" className="" onClick={toggleIcon} />
-      {show && (
-        <div className="absolute top-16 right-1 w-[400px]">
-          <Input
-            type="search"
-            placeholder="Search Here..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            autoFocus
-          />
-        </div>
+    <form
+      onSubmit={handleSubmit}
+      className={cn(
+        "transition-transform duration-300 ease-linear",
+        open ? "translate-y-5" : "opacity-20 translate-y-[-400px]",
+        "z-[999] w-full flex justify-center px-1"
       )}
-    </div>
+    >
+      <Input
+        ref={searchRef}
+        type="search"
+        placeholder="Search Here..."
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        className="w-full md:w-96"
+      />
+    </form>
   );
 }

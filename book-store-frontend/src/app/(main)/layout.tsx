@@ -1,5 +1,6 @@
 import { Fragment, ReactNode } from "react";
 import Navbar from "@/components/global/navbar";
+import Search from "@/components/global/search";
 
 export default function MainLayout({
   children,
@@ -11,7 +12,10 @@ export default function MainLayout({
       <header>
         <Navbar />
       </header>
-      <main>{children}</main>
+      <main className="pt-20">
+        <Search />
+        {children}
+      </main>
     </Fragment>
   );
 }
