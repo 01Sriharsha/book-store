@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { SearchIcon } from "lucide-react";
-import { useAppDispatch } from "@/store";
+import { SearchIcon, X } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/store";
 import { toggleSearch } from "@/store/features/search-slice";
 import { Button } from "@/components/ui/button";
 import NavItem from "@/components/global/nav-item";
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
+  const { open } = useAppSelector((state) => state.search);
+  const Icon = open ? X : SearchIcon;
   return (
     <nav className="fixed inset-x-0 top-0 border-b border-b-zinc-700 z-50 bg-background">
       <div className="relative w-full py-4 px-2 flex items-center justify-between">
@@ -21,7 +23,7 @@ export default function Navbar() {
           </ul>
         </div>
         <div className="flex items-center gap-3">
-          <SearchIcon
+          <Icon
             role="button"
             className=""
             onClick={() => dispatch(toggleSearch())}
